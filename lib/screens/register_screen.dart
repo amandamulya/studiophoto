@@ -2,10 +2,16 @@
 import 'package:flutter/material.dart';
 import 'package:studiophoto/services/database_helper.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
+  @override
+  _RegisterScreenState createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final DatabaseHelper _databaseHelper = DatabaseHelper();
+  String _selectedRole = 'customer'; // Default role
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +33,22 @@ class RegisterScreen extends StatelessWidget {
               obscureText: true,
             ),
             SizedBox(height: 20),
+            DropdownButton<String>(
+              value: _selectedRole,
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedRole = newValue!;
+                });
+              },
+              items: <String>['admin', 'customer']
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
                 String email = _emailController.text;
@@ -38,7 +60,8 @@ class RegisterScreen extends StatelessWidget {
                   );
                   return;
                 }
-                await _databaseHelper.registerUser(email, password);
+                await _databaseHelper.registerUser(
+                    email, password, _selectedRole);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Registration successful')),
                 );

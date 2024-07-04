@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import '../widgets/drawer.dart';
 
 class HomeScreen extends StatelessWidget {
+  final String userRole;
+
+  HomeScreen({required this.userRole});
+
   final List<String> imageUrls = [
     'assets/images/prewedding.jpeg',
     'assets/images/personal.jpg',
@@ -18,7 +22,9 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Home'),
       ),
-      drawer: AppDrawer(),
+      drawer: AppDrawer(
+        userRole: userRole,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(

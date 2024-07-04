@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'order_detail_screen.dart'; // Import OrderDetailScreen
+import '../widgets/drawer.dart';
+import 'order_detail_screen.dart';
+import 'home_screen.dart';
 
 class BookingScreen extends StatefulWidget {
   final String selectedPackage;
@@ -23,7 +25,7 @@ class _BookingScreenState extends State<BookingScreen> {
   final _eventTimeController = TextEditingController();
 
   File? _image;
-  static final List<String> _bookedDateTimes = []; // List to store booked dates
+  static final List<String> _bookedDateTimes = [];
 
   @override
   void dispose() {
@@ -57,7 +59,7 @@ class _BookingScreenState extends State<BookingScreen> {
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
-        print('Image selected: ${_image!.path}'); // Debug print
+        print('Image selected: ${_image!.path}');
       });
     }
   }
@@ -86,11 +88,9 @@ class _BookingScreenState extends State<BookingScreen> {
         return;
       }
 
-      // Add booked date to the list
       final bookedDateTime =
           '${_eventDateController.text} ${_eventTimeController.text}';
 
-      // Check if the selected date and time is already booked
       if (_bookedDateTimes.contains(bookedDateTime)) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -100,16 +100,13 @@ class _BookingScreenState extends State<BookingScreen> {
         return;
       }
 
-      // Add booked date time to the set
       _bookedDateTimes.add(bookedDateTime);
 
-      // Get the values from controllers
       String eventDate = _eventDateController.text;
       String bookingDate = _bookingDateController.text;
       String eventTime = _eventTimeController.text;
 
-      // Navigate to OrderDetailScreen with the booking details
-      Navigator.of(context).push(
+      Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => OrderDetailScreen(
             name: _nameController.text,
@@ -121,14 +118,13 @@ class _BookingScreenState extends State<BookingScreen> {
             selectedPackage: widget.selectedPackage,
             category: widget.category,
             imagePath: _image,
+            userRole: 'customer',
           ),
         ),
       );
 
-      print(
-          'Navigating to OrderDetailScreen with image: ${_image!.path}'); // Debug print
+      print('Navigating to OrderDetailScreen with image: ${_image!.path}');
 
-      // Clear the form
       _formKey.currentState!.reset();
       _eventDateController.clear();
       _bookingDateController.clear();
@@ -144,6 +140,10 @@ class _BookingScreenState extends State<BookingScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Booking for ${widget.selectedPackage}'),
+      ),
+      drawer: AppDrawer(
+        userRole:
+            'customer', // Pastikan ini sesuai dengan peran pengguna yang sebenarnya
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -162,13 +162,13 @@ class _BookingScreenState extends State<BookingScreen> {
                 decoration: InputDecoration(labelText: 'Package'),
                 readOnly: true,
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 16),
               TextFormField(
                 initialValue: widget.category,
                 decoration: InputDecoration(labelText: 'Category'),
                 readOnly: true,
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(labelText: 'Name'),
@@ -179,7 +179,7 @@ class _BookingScreenState extends State<BookingScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(labelText: 'Email'),
@@ -190,10 +190,10 @@ class _BookingScreenState extends State<BookingScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _phoneController,
-                decoration: InputDecoration(labelText: 'Phone'),
+                decoration: InputDecoration(labelText: 'Phone Number'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your phone number';
@@ -201,90 +201,70 @@ class _BookingScreenState extends State<BookingScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _eventDateController,
-                decoration: InputDecoration(
-                  labelText: 'Tanggal Acara',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.calendar_today),
-                    onPressed: () => _selectDate(context, _eventDateController),
-                  ),
-                ),
+                decoration: InputDecoration(labelText: 'Event Date'),
+                onTap: () => _selectDate(context, _eventDateController),
                 readOnly: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please select the event date';
+                    return 'Please select an event date';
                   }
-
                   return null;
                 },
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _bookingDateController,
-                decoration: InputDecoration(
-                  labelText: 'Tanggal Transfer',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.calendar_today),
-                    onPressed: () =>
-                        _selectDate(context, _bookingDateController),
-                  ),
-                ),
+                decoration: InputDecoration(labelText: 'Booking Date'),
+                onTap: () => _selectDate(context, _bookingDateController),
                 readOnly: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please select the booking date';
+                    return 'Please select a booking date';
                   }
                   return null;
                 },
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _eventTimeController,
-                decoration: InputDecoration(
-                  labelText: 'Jam Acara',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.access_time),
-                    onPressed: () => _selectTime(context, _eventTimeController),
-                  ),
-                ),
+                decoration: InputDecoration(labelText: 'Event Time'),
+                onTap: () => _selectTime(context, _eventTimeController),
                 readOnly: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please select the event time';
+                    return 'Please select an event time';
                   }
-
                   return null;
                 },
               ),
               SizedBox(height: 16),
               Text(
-                'Note: Minimum transfer amount is IDR 100.000.',
-                style: TextStyle(
-                    fontSize: 8,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red),
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Upload Screenshot of Transfer:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                'Upload Screenshot of Transfer',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 8),
-              _image == null
-                  ? Text('No image selected.')
-                  : Image.file(_image!,
-                      height: 200, width: 200, fit: BoxFit.cover),
-              SizedBox(height: 8),
+              Center(
+                child: _image == null
+                    ? Text('No image selected.')
+                    : Image.file(
+                        _image!,
+                        width: 200,
+                        height: 200,
+                      ),
+              ),
               ElevatedButton(
                 onPressed: _pickImage,
-                child: Text('Choose Image'),
+                child: Text('Pick Image'),
               ),
               SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _submitBooking,
-                child: Text('Submit Booking'),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _submitBooking,
+                  child: Text('Submit Booking'),
+                ),
               ),
             ],
           ),

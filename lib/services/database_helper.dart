@@ -2,6 +2,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/booking.dart';
+import '../screens/login_screen.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -49,40 +50,33 @@ class DatabaseHelper {
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) {
           await db.execute('''
-            CREATE TABLE bookings (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              name TEXT NOT NULL,
-              email TEXT NOT NULL,
-              phone TEXT NOT NULL,
-              eventDate TEXT NOT NULL,
-              bookingDate TEXT NOT NULL,
-              selectedPackage TEXT NOT NULL,
-              category TEXT NOT NULL,
-              imagePath TEXT NOT NULL
-            )
+            ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'customer'
           ''');
         }
       },
     );
   }
 
-  Future<void> registerUser(String email, String password) async {
+  Future<void> registerUser(String email, String password, String role) async {
     final db = await database;
     await db.insert(
       'users',
-      {'email': email, 'password': password},
+      {'email': email, 'password': password, 'role': 'role'},
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  Future<bool> loginUser(String email, String password) async {
+  Future<Map<String, dynamic>?> loginUser(String email, String password) async {
     final db = await database;
     var result = await db.query(
       'users',
       where: 'email = ? AND password = ?',
       whereArgs: [email, password],
     );
-    return result.isNotEmpty;
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+    return null;
   }
 
   Future<void> insertBooking(Map<String, dynamic> bookingData) async {

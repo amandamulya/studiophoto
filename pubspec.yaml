@@ -28,5 +28,9 @@ flutter:
     - assets/images/graduation.jpeg
     - assets/images/group.jpeg
     - assets/images/maternity.jpeg
-    - assets/images/personal.jpg
-    - assets/images/engagement.jpeg
+    - assets/images/personal.jpeg
+    - assets/images/engagement.jpg
+    - assets/images/bukti_transfer.jpg
+    - assets/images/background.png
+    - assets/images/bg.png
+    - assets/images/thanks.png
